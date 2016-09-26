@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <title></title>
+</head>
+<body>
+<h2>検索</h2>
+<ul>
+  <li>
+キーを入力してください。
+<form method="post" action="cgi-bin/applconn.py">
+<input id="key" type="text" name="key" />
+<div id="direction">
+方向を逆にする: <input id="reversed" type="checkbox" name="reversed" value="true" />
+</div>
+  </li>
+<input type="submit" value="Submit" />
+</ul>
+</form>
+
+
+<h2>データ登録</h2>
+<form method="post" action="cgi-bin/register.py">
+<ul>
+  <li>
+キーを入力してください。
+<input id="key" type="text" name="key" />
+  </li>
+  <li>
+関係を入力してください。
+<input id="key" type="text" name="key1" />
+→
+<input id="key" type="text" name="key2" />
+  </li>
+<input type="submit" value="Submit" />
+</ul>
+</form>
+
+
+
+<h2>データ参照</h2>
+<ul>
+  <li>
+<a href="./a.txt">
+全データ
+</a>
+  </li>
+  <li>
+<a href="./a.svg">
+全ノード
+</a>
+  </li>
+</ul>
+
+</body>
+</html>
+
