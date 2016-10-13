@@ -12,11 +12,14 @@ $ sudo chown apache.apache /usr/local/applconn
 $ sudo chmod 777 /usr/local/applconn
 $ sudo cp -i batchregister.py /usr/local/bin
 
-# CGI
+# (Optional)CGI
 $ sudo mkdir /var/www/html/applconn
 $ sudo chown apache.apache /var/www/html/applconn
 $ sudo chmod 644 /var/www/html/applconn
 $ sudo cp -iR cgi-bin/ index.html /var/www/html/applconn
+
+# (Optional)Kibana
+$ curl -XPUT ${elasticsearchurl}:9200/applconn
 ~~~~
 
 # Usage

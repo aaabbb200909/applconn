@@ -2,7 +2,7 @@
 
 ###
 json_filepath="/usr/local/applconn/applconn.json"
-elasticsearchurl='127.0.0.1'
+elasticsearchurl='centos-virt17:9200'
 elasticsearch_path='/applconn/'
 ###
 
@@ -85,8 +85,7 @@ def main():
 
     # ES output
     for nodejson in js["nodes"]:
-        #os.popen('curl --silent --max-time 15 -XPUT http://%s/applconn/%s -d %s > /dev/null' % (elasticsearchurl, nodejson["id"], nodejson)
-        print('curl --silent --max-time 15 -XPUT http://%s/applconn/%s -d "%s" > /dev/null' % (elasticsearchurl, nodejson["id"], nodejson))
+        os.popen("curl --silent --max-time 15 -XPOST http://%s/applconn/%s -d '%s' > /dev/null" % (elasticsearchurl, nodejson["id"], json.dumps(nodejson)))
 
  
 if __name__ == "__main__":
