@@ -3,7 +3,7 @@
 ###
 #json_filepath="/usr/local/applconn/applconn.json"
 json_filepath="/var/tmp/applconn/applconn.json"
-elasticsearchurl='centos-virt17:9200'
+elasticsearchurl='localhost:9200'
 elasticsearch_path='/applconn/'
 ###
 
@@ -64,10 +64,10 @@ def import_testlogic(G):
     G.add_node('2')
     G.add_edge('1','2') 
     ## add attribute
-    #st.node['1']['color']='red'
-    #st.node['1']['URL']='http://www.google.co.jp'
-    #st['1']['2']['color']='blue'
-
+    G.node['1']['color']='red'
+    G.node['2']['color']='blue'
+    for n in G:
+     G.node[n]['name'] = n
 
 list_import_def=[
     import_testlogic

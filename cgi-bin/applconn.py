@@ -9,8 +9,10 @@ import networkx as nx
 from networkx.readwrite import json_graph
  
 ###
-pathprefix='/var/www/html/applconn/'
-json_filepath='/usr/local/applconn/applconn.json'
+#pathprefix='/var/www/html/applconn/'
+#json_filepath='/usr/local/applconn/applconn.json'
+pathprefix='/var/tmp/applconn/'
+json_filepath='/var/tmp/applconn/applconn.json'
 ##
 
 def errorhtml(txt):
