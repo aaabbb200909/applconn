@@ -5,9 +5,13 @@ import cgi
 import os
 import sys
 import json
+import urllib
 import networkx as nx
 from networkx.readwrite import json_graph
  
+###
+enable_ganglia=False
+ganglia_url='http://172.17.0.2/ganglia/'
 ###
 #pathprefix='/var/www/html/applconn/'
 #json_filepath='/usr/local/applconn/applconn.json'
@@ -62,8 +66,23 @@ def main():
     for n in st:
      tmp = st.node[n]
      tmp['name'] = n
-     if (G.node[n].has_key('color')):
-      tmp['color'] = G.node[n]['color']
+     if (enable_ganglia):
+      metric_url='{0}/api/metrics.php?host={1}&metric_name=load_one'.format(ganglia_url, n)
+      f = urllib.urlopen(metric_url)
+      js=json.loads(f.read()) # {"status":"ok","message":{"metric_value":"0.51","units":" "}}
+      f.close()
+
+      load_one=float(js['message']['metric_value'])
+      if (1.0 < load_one):
+       tmp['color'] = '#ff634f'
+      elif (0.5 < load_one < 1.0):
+       tmp['color'] = '#ffde5e'
+      else:
+       tmp['color'] = '#e2ecff'
+      #raise Exception, tmp['color']
+     else: 
+      if (G.node[n].has_key('color')):
+       tmp['color'] = G.node[n]['color']
 
     # json output
     js=json_graph.node_link_data(st)

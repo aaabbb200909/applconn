@@ -68,8 +68,8 @@ def import_testlogic(G):
     G.add_node('172.17.0.4')
     G.add_edge('172.17.0.3','172.17.0.4')
     ## add attribute
-    G.node['1']['color']='red'
-    G.node['2']['color']='blue'
+    G.node['1']['color']='red'  # '#ffde5e'
+    G.node['2']['color']='blue' # '#ff634f'
     for n in G:
      G.node[n]['name'] = n
 
