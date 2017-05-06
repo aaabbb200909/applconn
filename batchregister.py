@@ -70,6 +70,7 @@ def import_testlogic(G):
     ## add attribute
     G.node['1']['color']='red'  # '#ffde5e'
     G.node['2']['color']='blue' # '#ff634f'
+    G.node['1']['href']='http://www.google.co.jp'
     for n in G:
      G.node[n]['name'] = n
 

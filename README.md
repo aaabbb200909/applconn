@@ -28,5 +28,6 @@ $ curl -XPUT ${elasticsearchurl}:9200/applconn
 https://github.com/aaabbb200909/applconn/wiki
 
 # Reference
-blog (written in Japanese) http://aaabbb-200904.hatenablog.jp/archive/category/applconn
+blog (written in Japanese)  
+http://aaabbb-200904.hatenablog.jp/archive/category/applconn
 

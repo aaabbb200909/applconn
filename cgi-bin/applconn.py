@@ -10,7 +10,7 @@ import networkx as nx
 from networkx.readwrite import json_graph
  
 ###
-enable_ganglia=False
+enable_ganglia=True
 ganglia_url='http://172.17.0.2/ganglia/'
 ###
 #pathprefix='/var/www/html/applconn/'
@@ -80,9 +80,12 @@ def main():
       else:
        tmp['color'] = '#e2ecff'
       #raise Exception, tmp['color']
+      tmp['href'] = '{0}?c=unspecified&h={1}'.format(ganglia_url, n)
      else: 
       if (G.node[n].has_key('color')):
        tmp['color'] = G.node[n]['color']
+      if (G.node[n].has_key('href')):
+       tmp['href'] = G.node[n]['href']
 
     # json output
     js=json_graph.node_link_data(st)

@@ -35,6 +35,7 @@ d3.json(jsonpath, function(json) {
       .attr("cy", function(d) { return d.y; })
       .attr("r", 15)
       .style("fill", function(d) { return d.color; })
+      .on("click", function(d) { window.open(d.href); })
       .call(force.drag);
 
   node.append("svg:title")
