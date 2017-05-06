@@ -4,7 +4,9 @@ import rsync+git to create JSON (optionally visualize with networkx+graphviz, se
 # Install
 (Procedure is for CentOS7):
 ~~~~
-$ git clone git@github.com:aaabbb200909/applconn.git && cd applconn
+$ sudo yum install graphviz
+$ sudo pip install networkx pygraphviz
+$ git clone https://github.com/aaabbb200909/applconn.git && cd applconn
 
 # Batch
 $ sudo mkdir /usr/local/applconn

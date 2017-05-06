@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 ###
-json_filepath="/usr/local/applconn/applconn.json"
+#json_filepath="/usr/local/applconn/applconn.json"
+json_filepath="/var/tmp/applconn/applconn.json"
 elasticsearchurl='centos-virt17:9200'
 elasticsearch_path='/applconn/'
 ###
