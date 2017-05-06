@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: applconn-containers
+spec:
+  restartPolicy: Never 
+  containers:
+  - name: elasticsearch-container
+    image: elasticsearch
+  - name: kibana-container
+    image: kibana
+    env:
+      - name: "ELASTICSEARCH_URL"
+        value: "http://127.0.0.1:9200"
+  - name: applconn-container
+    image: tnaganawa/applconn
+    lifecycle:
+      postStart:
+        exec:
+          command: ["/bin/bash", "-c", "cd /var/tmp/applconn; sleep 30; ./batchregister.py"]
