@@ -4,24 +4,19 @@ import rsync+git to create JSON (optionally visualize with networkx+graphviz, se
 # Install
 (Procedure is for CentOS7):
 ~~~~
-$ sudo yum install graphviz
+$ sudo yum install graphviz graphviz-devel gcc python-devel
 $ sudo pip install networkx pygraphviz
-$ git clone https://github.com/aaabbb200909/applconn.git && cd applconn
+$ cd /var/tmp && git clone https://github.com/aaabbb200909/applconn.git && cd applconn
+$ ./batchregister.py # create test json
+$ python -m CGIHTTPServer
 
-# Batch
-$ sudo mkdir /usr/local/applconn
-$ sudo chown apache.apache /usr/local/applconn
-$ sudo chmod 777 /usr/local/applconn
-$ sudo cp -i batchregister.py /usr/local/bin
+Then access this URL
+http://127.0.0.1:8000
 
-# (Optional)CGI
-$ sudo mkdir /var/www/html/applconn
-$ sudo chown apache.apache /var/www/html/applconn
-$ sudo chmod 644 /var/www/html/applconn
-$ sudo cp -iR cgi-bin/ index.html /var/www/html/applconn
-
-# (Optional)Kibana
-$ curl -XPUT ${elasticsearchurl}:9200/applconn
+you can also try docker
+$ sudo docker run -it tnaganawa/applconn
+or kubernetes
+$ sudo kubectl ./pod.yaml
 ~~~~
 
 # Usage
