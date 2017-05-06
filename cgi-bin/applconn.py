@@ -71,16 +71,19 @@ def main():
       f = urllib.urlopen(metric_url)
       js=json.loads(f.read()) # {"status":"ok","message":{"metric_value":"0.51","units":" "}}
       f.close()
-
-      load_one=float(js['message']['metric_value'])
-      if (1.0 < load_one):
-       tmp['color'] = '#ff634f'
-      elif (0.5 < load_one < 1.0):
-       tmp['color'] = '#ffde5e'
-      else:
-       tmp['color'] = '#e2ecff'
+      if (js['status']=='ok'):
+       load_one=float(js['message']['metric_value'])
+       if (1.0 < load_one):
+        tmp['color'] = '#ff634f'
+       elif (0.5 < load_one < 1.0):
+        tmp['color'] = '#ffde5e'
+       else:
+        tmp['color'] = '#e2ecff'
       #raise Exception, tmp['color']
-      tmp['href'] = '{0}?c=unspecified&h={1}'.format(ganglia_url, n)
+      if (n.find('_cpu') > -1):
+       tmp['href'] = '{0}/graph_all_periods.php?hreg%5B%5D={1}&mreg%5B%5D=cpu_&aggregate=1'.format(ganglia_url, n[:-4])
+      else:
+       tmp['href'] = '{0}?c=unspecified&h={1}'.format(ganglia_url, n)
      else: 
       if (G.node[n].has_key('color')):
        tmp['color'] = G.node[n]['color']
