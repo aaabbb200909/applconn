@@ -59,8 +59,11 @@ def main():
     st=nx.dfs_tree(G, key)
     
     ### add attribute
-    #for node in st.nodes():
-    #    node['href']='http://www.google.co.jp'
+    for n in st:
+     tmp = st.node[n]
+     tmp['name'] = n
+     if (G.node[n].has_key('color')):
+      tmp['color'] = G.node[n]['color']
 
     # json output
     js=json_graph.node_link_data(st)
@@ -95,7 +98,14 @@ def main():
         <a href="../1.txt">データ</a>
         </div>
         <div id="d3">
-        <a href="../applconn.html">d3-graph</a>
+
+    <div id="chart"></div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="../applconn.css"/>
+    <script>var jsonpath="../1.json";</script>
+    <script type="text/javascript" src="../applconn.js"></script>
+
+        <a href="../1.json">d3-graph-data</a>
         </div>
         </body>
         </html>
