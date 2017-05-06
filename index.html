@@ -5,31 +5,46 @@
         <title></title>
 </head>
 <body>
-<h2>検索</h2>
+<h2>Search</h2>
+<form method="post" action="cgi-bin/applconn.py">
+Input computation start point:
+<input id="key" type="text" name="key" />
+direction-reversed: <input id="reversed" type="checkbox" name="reversed" value="true" />
 <ul>
   <li>
-キーを入力してください。
-<form method="post" action="cgi-bin/applconn.py">
-<input id="key" type="text" name="key" />
-<div id="direction">
-方向を逆にする: <input id="reversed" type="checkbox" name="reversed" value="true" />
-</div>
+<input type="submit" value="DFS search" name="dfsmode" />
   </li>
-<input type="submit" value="Submit" />
+  <li>
+   <ul>
+    <li>
+neighbor distance: <input id="distance" type="text" name="distance" value="5" />
+    </li>
+    <li>
+undirectional or directional:
+<select id="graphtype" name="graphtype">
+<option value="directional">directional</option>
+<option value="undirectional">undirectional</option>
+</select>
+    </li>
+   </ul>
+  </li>
+<input type="submit" value="distance" name="distancemode" />
+
+
 </ul>
 </form>
 
 
-<h2>データ参照</h2>
+<h2>dump raw data</h2>
 <ul>
   <li>
 <a href="./applconn.json">
-全データ
+node data
 </a>
   </li>
   <li>
 <a href="./applconn.html">
-全ノード
+node graph
 </a>
   </li>
 </ul>

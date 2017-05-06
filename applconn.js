@@ -7,7 +7,6 @@ var vis = d3.select("#chart")
     .attr("width", w)
     .attr("height", h);
 
-//d3.json("1.json", function(json) {
 d3.json(jsonpath, function(json) {
   var force = d3.layout.force()
       .charge(-120)

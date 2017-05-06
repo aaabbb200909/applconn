@@ -47,20 +47,49 @@ def main():
 
     if (not fs.has_key('key')):
         errorhtml('No key defined')
-
     key=fs['key'].value
+    if (not key in G.nodes()):
+        errorhtml('No Such key') 
+
+    compute_mode="dfs" # "dfs", "distance"
+    if fs.has_key("dfsmode"):
+     compute_mode="dfs"
+    elif fs.has_key("distancemode"):
+     compute_mode="distance"
+     if (fs.has_key('distance')): 
+      distance=fs['distance'].value
+     else:
+      distance=None # infinite large number
+     if (fs.has_key('graphtype')): 
+      graphtype=fs['graphtype'].value # 'undirectional' or 'directional'
+     else:
+      graphtype='directional'
+    else:
+     errorhtml("No computation mode is specified")
+
+    # if reversed is specified, create reversed graph
     if (fs.has_key('reversed')): 
         reversed=True
     else:
         reversed=False
- 
-    if (not key in G.nodes()):
-        errorhtml('No Such key') 
-
-    ## Compute Tree from key node
     if (reversed):
         G=G.reverse()
-    st=nx.dfs_tree(G, key)
+
+    ## Compute Tree from key node
+    if (compute_mode=="dfs"):
+     st=nx.dfs_tree(G, key) # "st" means "spanning tree"
+    elif (compute_mode=="distance"):
+     if (graphtype == "undirectional"):
+      G=nx.Graph(G)
+      st=nx.Graph()
+     else:
+      st=nx.DiGraph()
+     if (distance == None):
+      paths = nx.single_source_shortest_path(G, key)
+     else:
+      paths = nx.single_source_shortest_path(G, key, cutoff=distance)
+     st.add_path(paths)
+     #raise Exception(st.nodes())
     
     ### add attribute
     for n in st:
