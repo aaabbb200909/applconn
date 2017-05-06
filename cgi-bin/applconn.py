@@ -11,7 +11,7 @@ from networkx.readwrite import json_graph
  
 ###
 enable_ganglia=True
-ganglia_url='http://172.17.0.2/ganglia/'
+ganglia_url='http://127.0.0.1/ganglia/'
 ###
 #pathprefix='/var/www/html/applconn/'
 #json_filepath='/usr/local/applconn/applconn.json'

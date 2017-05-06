@@ -16,7 +16,7 @@ http://127.0.0.1:8000
 you can also try docker
 $ sudo docker run -it tnaganawa/applconn
 or kubernetes
-$ sudo kubectl ./pod.yaml
+$ sudo kubectl create -f ./pod.yaml
 ~~~~
 
 # Usage
