@@ -61,6 +61,11 @@ def main():
     ### add attribute
     #for node in st.nodes():
     #    node['href']='http://www.google.co.jp'
+
+    # json output
+    js=json_graph.node_link_data(st)
+    with open('{0}/1.json'.format(pathprefix), 'w') as f:
+        f.write(json.dumps(js, sort_keys=True, indent=4))
     
     ## Graphviz
     A=nx.nx_agraph.to_agraph(st)
@@ -88,6 +93,9 @@ def main():
          %s
         <div id="data">
         <a href="../1.txt">データ</a>
+        </div>
+        <div id="d3">
+        <a href="../applconn.html">d3-graph</a>
         </div>
         </body>
         </html>

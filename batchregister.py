@@ -63,6 +63,10 @@ def import_testlogic(G):
     G.add_node('1')
     G.add_node('2')
     G.add_edge('1','2') 
+    #
+    G.add_node('172.17.0.3')
+    G.add_node('172.17.0.4')
+    G.add_edge('172.17.0.3','172.17.0.4')
     ## add attribute
     G.node['1']['color']='red'
     G.node['2']['color']='blue'
