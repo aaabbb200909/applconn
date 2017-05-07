@@ -145,7 +145,7 @@ def main():
       if (n.find('_cpu') > -1):
        tmp['href'] = '{0}/graph_all_periods.php?hreg%5B%5D={1}&mreg%5B%5D=cpu_&aggregate=1'.format(ganglia_url, n[:-4])
       else:
-       tmp['href'] = '{0}?c=unspecified&h={1}'.format(ganglia_url, n)
+       tmp['href'] = './node-hrefs.py?key={0}'.format(n)
      else: 
       if (G.node[n].has_key('color')):
        tmp['color'] = G.node[n]['color']
