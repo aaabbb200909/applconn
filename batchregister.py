@@ -59,6 +59,19 @@ def import_libvirt(G):
     pass
 
 
+def import_ansible_facts(G):
+    '''import ansible facts
+    create-fact command: ansible all -i /tmp/hosts -m setup -t /tmp/ansible_facts
+    '''
+    ansible_facts_dir='/tmp/ansible_facts/'
+    import glob
+    import os
+    for factpath in glob.glob(ansible_facts_dir+'*'):
+     nodename=os.path.basename(factpath)
+     with open(factpath) as f:
+      js=json.loads(f.read())
+     G.add_node(nodename, js)
+
 def import_testlogic(G):
     G.add_node('1')
     G.add_node('2')
@@ -76,6 +89,7 @@ def import_testlogic(G):
      G.node[n]['name'] = n
 
 list_import_def=[
+    #import_ansible_facts,
     import_testlogic
 ]
 

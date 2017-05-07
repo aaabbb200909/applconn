@@ -96,18 +96,22 @@ def main():
      tmp = st.node[n]
      tmp['name'] = n
      if (enable_ganglia):
-      metric_url='{0}/api/metrics.php?host={1}&metric_name=load_one'.format(ganglia_url, n)
-      f = urllib.urlopen(metric_url)
-      js=json.loads(f.read()) # {"status":"ok","message":{"metric_value":"0.51","units":" "}}
-      f.close()
-      if (js['status']=='ok'):
-       load_one=float(js['message']['metric_value'])
-       if (1.0 < load_one):
-        tmp['color'] = '#ff634f'
-       elif (0.5 < load_one < 1.0):
-        tmp['color'] = '#ffde5e'
-       else:
-        tmp['color'] = '#e2ecff'
+      try:
+       metric_url='{0}/api/metrics.php?host={1}&metric_name=load_one'.format(ganglia_url, n)
+       f = urllib.urlopen(metric_url)
+       js=json.loads(f.read()) # {"status":"ok","message":{"metric_value":"0.51","units":" "}}
+       f.close()
+       if (js['status']=='ok'):
+        load_one=float(js['message']['metric_value'])
+        if (1.0 < load_one):
+         tmp['color'] = '#ff634f'
+        elif (0.5 < load_one < 1.0):
+         tmp['color'] = '#ffde5e'
+        else:
+         tmp['color'] = '#e2ecff'
+      except (IOError):
+       pass # ganglia is not available
+
       #raise Exception, tmp['color']
       if (n.find('_cpu') > -1):
        tmp['href'] = '{0}/graph_all_periods.php?hreg%5B%5D={1}&mreg%5B%5D=cpu_&aggregate=1'.format(ganglia_url, n[:-4])
