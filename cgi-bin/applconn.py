@@ -95,8 +95,8 @@ def main():
       paths = nx.single_source_shortest_path(G, key)
      else:
       paths = nx.single_source_shortest_path(G, key, cutoff=distance)
-     st.add_path(paths)
-     #raise Exception(st.nodes())
+     for target_node in paths.keys():
+      st.add_path(paths[target_node])
     
     ### add attribute
     for n in st:
