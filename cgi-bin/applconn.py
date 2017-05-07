@@ -59,6 +59,12 @@ def main():
       graphtype=fs['graphtype'].value # 'undirectional' or 'directional'
      else:
       graphtype='directional'
+    elif fs.has_key("shortestpathmode"):
+     compute_mode="shortestpath"
+     if (fs.has_key('shortest_path_target')):
+      shortest_path_target=fs['shortest_path_target'].value
+     else:
+      errorhtml("No shortest_path_target is given")
     else:
      errorhtml("No computation mode is specified")
 
@@ -105,7 +111,15 @@ def main():
       paths = nx.single_source_shortest_path(G, key, cutoff=distance)
      for target_node in paths.keys():
       st.add_path(paths[target_node])
-    
+
+    elif (compute_mode=="shortestpath"):
+     st=nx.DiGraph()
+     try:
+      for path in nx.all_shortest_paths(G, key, shortest_path_target):
+       st.add_path(path)
+     except(nx.exception.NetworkXNoPath):
+      errorhtml('No path found in given search codition') 
+
     ### add attribute
     for n in st:
      tmp = st.node[n]
