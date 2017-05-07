@@ -71,7 +71,7 @@ def import_ansible_facts(G):
       js=json.loads(f.read())
      # remove some info which ES don't like
      js["ansible_facts"]["ansible_python"]["version_info"]=[]
-     G.add_node(nodename, js)
+     G.add_node(nodename, js, searchtag='All')
 
 def import_haproxy(G):
     '''import haproxy.cfg
@@ -103,19 +103,26 @@ def import_haproxy(G):
        apps.append(app)
        app=None
      # add to graph
+     G.add_node(nodename, searchtag='All')
+     G.add_node(nodename+"-haproxy", searchtag='Dev')
      G.add_edge(nodename, nodename+"-haproxy")
      for app in apps:
+      G.add_node(nodename+app["bind"], searchtag='Dev')
       G.add_edge(nodename+"-haproxy", nodename+app["bind"])
       G.add_edge(nodename+app["bind"], app["backend_ip"])
 
 def import_testlogic(G):
-    G.add_node('1')
-    G.add_node('2')
+    G.add_node('1', searchtag='All')
+    G.add_node('2', searchtag='All')
     G.add_edge('1','2') 
     #
-    G.add_node('172.17.0.3')
-    G.add_node('172.17.0.4')
+    G.add_node('172.17.0.3', searchtag='All')
+    G.add_node('172.17.0.4', searchtag='All')
+    G.add_node('172.17.0.0/24', searchtag='Ops')
+    G.add_node('172.17.0.3_cpu', searchtag='Ops') 
     #G.add_edge('172.17.0.3','172.17.0.4')
+    G.add_edge('172.17.0.0/24', '172.17.0.3')
+    G.add_edge('172.17.0.0/24', '172.17.0.4')
     G.add_edge('172.17.0.3','172.17.0.3_cpu') 
     ## add attribute
     G.node['1']['color']='red'  # '#ffde5e'

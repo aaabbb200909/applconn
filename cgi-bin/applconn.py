@@ -37,11 +37,6 @@ def main():
         jsondata=json.loads(f.read())
         G=json_graph.node_link_graph(jsondata)
 
-    ## Write down all the data
-    #A=nx.nx_agraph.to_agraph(G)
-    #A.write(pathprefix+'a.txt')
-    #drawimage('a')
-    
     ##
     fs=cgi.FieldStorage()
 
@@ -74,6 +69,19 @@ def main():
         reversed=False
     if (reversed):
         G=G.reverse()
+    searchtags=['All']
+    if (fs.has_key('SearchDev')): 
+     searchtags.append('Dev')
+    if (fs.has_key('SearchOps')): 
+     searchtags.append('Ops')
+    if (fs.has_key('SearchNet')): 
+     searchtags.append('Net')
+    for nodeid in G.nodes():
+     if (not 'searchtag' in G.node[nodeid] or not G.node[nodeid]['searchtag'] in searchtags):
+      G.remove_node(nodeid)
+
+    if (not key in G.nodes()):
+        errorhtml('No Such key in given search codition') 
 
     ## Compute Tree from key node
     if (compute_mode=="dfs"):
@@ -160,7 +168,7 @@ def main():
         <h2>graph</h2>
          %s
         <div id="data">
-        <a href="../1.txt">データ</a>
+        <a href="../1.txt">Data</a>
         </div>
         <div id="d3">
 
