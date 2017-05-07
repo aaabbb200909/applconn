@@ -13,6 +13,7 @@ import os
 import sys
 import glob
 import json
+import requests
 import networkx as nx
 from networkx.readwrite import json_graph
 
@@ -145,13 +146,17 @@ def main():
     js=json_graph.node_link_data(G)
 
     # ES output
-    import requests
-    os.system("curl --max-time 15 -XDELETE http://%s/applconn/" % (elasticsearchurl))
-    for nodejson in js["nodes"]:
-     returned=requests.post('http://{0}/applconn/{1}'.format(elasticsearchurl, nodejson["id"]), data=json.dumps(nodejson))
-     #os.system("curl --max-time 15 -XPOST http://%s/applconn/%s -d '%s'" % (elasticsearchurl, nodejson["id"], json.dumps(nodejson)))
-     kibanaid=json.loads(returned.content)["_id"]
-     nodejson["kibanaid"]=kibanaid
+
+    try:
+     requests.delete("http://{0}/applconn/".format(elasticsearchurl))
+
+     for nodejson in js["nodes"]:
+      returned=requests.post('http://{0}/applconn/{1}'.format(elasticsearchurl, nodejson["id"]), data=json.dumps(nodejson))
+      kibanaid=json.loads(returned.content)["_id"]
+      nodejson["kibanaid"]=kibanaid
+
+    except(requests.exceptions.ConnectionError) as e:
+     print ("WARN: can't connect ES")
 
     # json output
     with open(json_filepath,'w') as f:
