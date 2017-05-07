@@ -70,6 +70,8 @@ def import_ansible_facts(G):
      nodename=os.path.basename(factpath)
      with open(factpath) as f:
       js=json.loads(f.read())
+     # remove some info which ES don't like
+     js["ansible_facts"]["ansible_python"]["version_info"]=[]
      G.add_node(nodename, js)
 
 def import_testlogic(G):
@@ -105,6 +107,7 @@ def main():
         f.write(json.dumps(js, sort_keys=True, indent=4))
 
     # ES output
+    os.popen("curl --silent --max-time 15 -XDELETE http://%s/applconn/ > /dev/null" % (elasticsearchurl))
     for nodejson in js["nodes"]:
         os.popen("curl --silent --max-time 15 -XPOST http://%s/applconn/%s -d '%s' > /dev/null" % (elasticsearchurl, nodejson["id"], json.dumps(nodejson)))
 
