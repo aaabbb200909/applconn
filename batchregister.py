@@ -115,7 +115,7 @@ def import_testlogic(G):
     #
     G.add_node('172.17.0.3')
     G.add_node('172.17.0.4')
-    G.add_edge('172.17.0.3','172.17.0.4')
+    #G.add_edge('172.17.0.3','172.17.0.4')
     G.add_edge('172.17.0.3','172.17.0.3_cpu') 
     ## add attribute
     G.node['1']['color']='red'  # '#ffde5e'
@@ -142,9 +142,9 @@ def main():
         f.write(json.dumps(js, sort_keys=True, indent=4))
 
     # ES output
-    os.popen("curl --silent --max-time 15 -XDELETE http://%s/applconn/ > /dev/null" % (elasticsearchurl))
+    os.system("curl --max-time 15 -XDELETE http://%s/applconn/" % (elasticsearchurl))
     for nodejson in js["nodes"]:
-        os.popen("curl --silent --max-time 15 -XPOST http://%s/applconn/%s -d '%s' > /dev/null" % (elasticsearchurl, nodejson["id"], json.dumps(nodejson)))
+        os.system("curl --max-time 15 -XPOST http://%s/applconn/%s -d '%s'" % (elasticsearchurl, nodejson["id"], json.dumps(nodejson)))
 
  
 if __name__ == "__main__":
