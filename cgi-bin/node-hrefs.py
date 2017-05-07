@@ -11,6 +11,7 @@ from networkx.readwrite import json_graph
 ###
 enable_ganglia=True
 ganglia_url='http://127.0.0.1/ganglia/'
+kibana_url='http://172.17.0.5:5601/app/kibana#/doc/*/applconn/'
 ###
 #pathprefix='/var/www/html/applconn/'
 #json_filepath='/usr/local/applconn/applconn.json'
@@ -44,10 +45,16 @@ def main():
     # create urls:
     urls = []
 
-    urls.append('{0}?c=unspecified&h={1}'.format(ganglia_url, key))
 
+    # default url
     if (G.node[key].has_key('href')):
      urls.append(G.node[key]['href'])
+    # ganglia url
+    urls.append('{0}?c=unspecified&h={1}'.format(ganglia_url, key))
+    # kibana url
+    urls.append('{0}{1}?id={2}'.format(kibana_url, key, G.node[key]['kibanaid']))
+
+    # join urls
     urlhtml='<br/>'.join(
      '<a href="{0}">link</a>'.format(url) for url in urls
     )

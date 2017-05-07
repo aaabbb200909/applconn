@@ -144,14 +144,19 @@ def main():
         func(G)
     js=json_graph.node_link_data(G)
 
+    # ES output
+    import requests
+    os.system("curl --max-time 15 -XDELETE http://%s/applconn/" % (elasticsearchurl))
+    for nodejson in js["nodes"]:
+     returned=requests.post('http://{0}/applconn/{1}'.format(elasticsearchurl, nodejson["id"]), data=json.dumps(nodejson))
+     #os.system("curl --max-time 15 -XPOST http://%s/applconn/%s -d '%s'" % (elasticsearchurl, nodejson["id"], json.dumps(nodejson)))
+     kibanaid=json.loads(returned.content)["_id"]
+     nodejson["kibanaid"]=kibanaid
+
     # json output
     with open(json_filepath,'w') as f:
         f.write(json.dumps(js, sort_keys=True, indent=4))
 
-    # ES output
-    os.system("curl --max-time 15 -XDELETE http://%s/applconn/" % (elasticsearchurl))
-    for nodejson in js["nodes"]:
-        os.system("curl --max-time 15 -XPOST http://%s/applconn/%s -d '%s'" % (elasticsearchurl, nodejson["id"], json.dumps(nodejson)))
 
  
 if __name__ == "__main__":
