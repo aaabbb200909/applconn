@@ -78,6 +78,13 @@ def main():
     ## Compute Tree from key node
     if (compute_mode=="dfs"):
      st=nx.dfs_tree(G, key) # "st" means "spanning tree"
+
+     # add other edge if other paths are there:
+     for node1 in st.nodes():
+      for node2 in st.nodes():
+       if G.has_edge(node1, node2):
+        st.add_edge(node1,node2)
+
     elif (compute_mode=="distance"):
      if (graphtype == "undirectional"):
       G=nx.Graph(G)
