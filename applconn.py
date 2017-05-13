@@ -32,9 +32,6 @@ def applconn():
         jsondata=json.loads(f.read())
         G=json_graph.node_link_graph(jsondata)
 
-    ##
-    #fs=cgi.FieldStorage()
-    #raise Exception(request.form)
     fs=request.form
 
     if (not fs.has_key('key')):
@@ -203,10 +200,7 @@ def node_hrefs():
         jsondata=json.loads(f.read())
         G=json_graph.node_link_graph(jsondata)
 
-    ##
-    #fs=cgi.FieldStorage()
     fs=request.args # when GET, use this
-    #print (fs)
 
     if (not fs.has_key('key')):
      errorhtml('No key defined')

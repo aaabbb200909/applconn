@@ -8,10 +8,10 @@ $ sudo yum install graphviz graphviz-devel gcc python-devel
 $ sudo pip install networkx pygraphviz flask
 $ cd /var/tmp && git clone https://github.com/aaabbb200909/applconn.git && cd applconn
 $ ./batchregister.py # create test json
-$ python -m CGIHTTPServer
+$ ./applconn.py
 
 Then access this URL
-http://127.0.0.1:8000
+http://127.0.0.1:5000
 
 you can also try docker
 $ sudo docker run -it tnaganawa/applconn
@@ -20,7 +20,7 @@ $ sudo kubectl create -f ./pod.yaml
 ~~~~
 
 # Usage
-https://github.com/aaabbb200909/applconn/wiki
+https://github.com/tnaganawa/applconn/wiki
 
 # Reference
 blog (written in Japanese)  
