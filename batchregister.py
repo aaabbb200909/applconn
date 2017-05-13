@@ -2,9 +2,9 @@
 
 ###
 #json_filepath="/usr/local/applconn/applconn.json"
-json_filepath="/var/tmp/applconn/applconn.json"
-elasticsearchurl='localhost:9200'
-#elasticsearchurl='172.17.0.5:9200'
+json_filepath="/var/tmp/applconn/static/applconn.json"
+#elasticsearchurl='localhost:9200'
+elasticsearchurl='172.17.0.5:9200'
 elasticsearch_path='/applconn/'
 rsyncgitpath='/var/tmp/rsyncgit/'
 ###
