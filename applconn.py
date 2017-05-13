@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
+#!/usr/bin/python
 import cgi
 import os
 import sys
@@ -8,29 +6,26 @@ import json
 import urllib
 import networkx as nx
 from networkx.readwrite import json_graph
- 
-###
-enable_ganglia=True
-ganglia_url='http://127.0.0.1/ganglia/'
-###
-#pathprefix='/var/www/html/applconn/'
-#json_filepath='/usr/local/applconn/applconn.json'
-pathprefix='/var/tmp/applconn/'
-json_filepath='/var/tmp/applconn/applconn.json'
-##
+from flask import Flask, render_template, url_for, request
+import settings
+
+app = Flask(__name__)
+
+enable_ganglia=settings.enable_ganglia
+ganglia_url=settings.ganglia_url
+kibana_url=settings.kibana_url
+pathprefix=settings.pathprefix
+json_filepath=settings.json_filepath
 
 def errorhtml(txt):
-    print("Content-Type: text/html")
-    print("")
-    print("Error: " + txt)
-    sys.exit(31)
-
+    return ("Error: " + txt)
 
 def drawimage(filename):
     os.system('dot -Tsvg %s/%s.txt -o %s/%s.svg' % (pathprefix, filename, pathprefix, filename))
 
 
-def main():
+@app.route("/applconn", methods=["POST"])
+def applconn():
     # Initialize Graph
     G=nx.DiGraph()
     with open(json_filepath) as f:
@@ -38,11 +33,13 @@ def main():
         G=json_graph.node_link_graph(jsondata)
 
     ##
-    fs=cgi.FieldStorage()
+    #fs=cgi.FieldStorage()
+    #raise Exception(request.form)
+    fs=request.form
 
     if (not fs.has_key('key')):
         errorhtml('No key defined')
-    key=fs['key'].value
+    key=fs['key']
     if (not key in G.nodes()):
         errorhtml('No Such key') 
 
@@ -52,17 +49,17 @@ def main():
     elif fs.has_key("distancemode"):
      compute_mode="distance"
      if (fs.has_key('distance')): 
-      distance=fs['distance'].value
+      distance=fs['distance']
      else:
       distance=None # infinite large number
      if (fs.has_key('graphtype')): 
-      graphtype=fs['graphtype'].value # 'undirectional' or 'directional'
+      graphtype=fs['graphtype'] # 'undirectional' or 'directional'
      else:
       graphtype='directional'
     elif fs.has_key("shortestpathmode"):
      compute_mode="shortestpath"
      if (fs.has_key('shortest_path_target')):
-      shortest_path_target=fs['shortest_path_target'].value
+      shortest_path_target=fs['shortest_path_target']
      else:
       errorhtml("No shortest_path_target is given")
     else:
@@ -145,12 +142,12 @@ def main():
       if (n.find('_cpu') > -1):
        tmp['href'] = '{0}/graph_all_periods.php?hreg%5B%5D={1}&mreg%5B%5D=cpu_&aggregate=1'.format(ganglia_url, n[:-4])
       else:
-       tmp['href'] = './node-hrefs.py?key={0}'.format(n)
+       tmp['href'] = './node-hrefs?key={0}'.format(n)
      else: 
       if (G.node[n].has_key('color')):
        tmp['color'] = G.node[n]['color']
       if (G.node[n].has_key('href')):
-       tmp['href'] = G.node[n]['href']
+       tmp['href'] = './node-hrefs?key={0}'.format(n)
 
     # json output
     js=json_graph.node_link_data(st)
@@ -169,9 +166,7 @@ def main():
         svgdata=svgfile.read()
     
     ## CGI
-    print ("Content-Type: text/html")
-    print ("")
-    print ("""
+    return ("""
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -182,17 +177,17 @@ def main():
         <h2>graph</h2>
          %s
         <div id="data">
-        <a href="../1.txt">Data</a>
+        <a href="static/1.txt">Data</a>
         </div>
         <div id="d3">
 
     <div id="chart"></div>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
-    <link type="text/css" rel="stylesheet" href="../applconn.css"/>
-    <script>var jsonpath="../1.json";</script>
-    <script type="text/javascript" src="../applconn.js"></script>
+    <link type="text/css" rel="stylesheet" href="static/applconn.css"/>
+    <script>var jsonpath="static/1.json";</script>
+    <script type="text/javascript" src="static/applconn.js"></script>
 
-        <a href="../1.json">d3-graph-data</a>
+        <a href="static/1.json">d3-graph-data</a>
         </div>
         </body>
         </html>
@@ -200,5 +195,63 @@ def main():
     )
 
 
+@app.route("/node-hrefs")
+def node_hrefs():
+    # Initialize Graph
+    G=nx.DiGraph()
+    with open(json_filepath) as f:
+        jsondata=json.loads(f.read())
+        G=json_graph.node_link_graph(jsondata)
+
+    ##
+    #fs=cgi.FieldStorage()
+    fs=request.args # when GET, use this
+    #print (fs)
+
+    if (not fs.has_key('key')):
+     errorhtml('No key defined')
+    key=fs['key']
+    if (not key in G.nodes()):
+     errorhtml('No Such key') 
+
+    # create urls:
+    urls = []
+
+    # default url
+    if (G.node[key].has_key('href')):
+     urls.append(G.node[key]['href'])
+    # ganglia url
+    if (settings.enable_ganglia):
+     urls.append('{0}?c=unspecified&h={1}'.format(ganglia_url, key))
+    # kibana url
+    if (settings.enable_elasticsearch):
+     urls.append('{0}{1}?id={2}'.format(kibana_url, key, G.node[key]['kibanaid']))
+
+    # join urls
+    urlhtml='<br/>'.join(
+     '<a href="{0}">link</a>'.format(url) for url in urls
+    )
+
+    ## CGI
+    return ("""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+                <meta charset="UTF-8">
+                <title></title>
+        </head>
+        <body>
+         {0}
+        </body>
+        </html>
+        """.format (urlhtml)
+    )
+
+
+@app.route("/")
+def index():
+    return render_template('index.html')
+
+
 if __name__ == "__main__":
-    main()
+    app.run()
