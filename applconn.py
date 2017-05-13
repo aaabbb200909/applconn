@@ -11,16 +11,11 @@ import settings
 
 app = Flask(__name__)
 
-###
-enable_ganglia=True
-ganglia_url='http://127.0.0.1/ganglia/'
-kibana_url='http://172.17.0.5:5601/app/kibana#/doc/*/applconn/'
-###
-#pathprefix='/var/www/html/applconn/'
-#json_filepath='/usr/local/applconn/applconn.json'
-pathprefix='/var/tmp/applconn/static'
-json_filepath='/var/tmp/applconn/static/applconn.json'
-##
+enable_ganglia=settings.enable_ganglia
+ganglia_url=settings.ganglia_url
+kibana_url=settings.kibana_url
+pathprefix=settings.pathprefix
+json_filepath=settings.json_filepath
 
 def errorhtml(txt):
     return ("Error: " + txt)
@@ -147,12 +142,12 @@ def applconn():
       if (n.find('_cpu') > -1):
        tmp['href'] = '{0}/graph_all_periods.php?hreg%5B%5D={1}&mreg%5B%5D=cpu_&aggregate=1'.format(ganglia_url, n[:-4])
       else:
-       tmp['href'] = './nodehrefs?key={0}'.format(n)
+       tmp['href'] = './node-hrefs?key={0}'.format(n)
      else: 
       if (G.node[n].has_key('color')):
        tmp['color'] = G.node[n]['color']
       if (G.node[n].has_key('href')):
-       tmp['href'] = G.node[n]['href']
+       tmp['href'] = './node-hrefs?key={0}'.format(n)
 
     # json output
     js=json_graph.node_link_data(st)
@@ -200,8 +195,8 @@ def applconn():
     )
 
 
-@app.route("/nodehrefs")
-def nodehrefs():
+@app.route("/node-hrefs")
+def node_hrefs():
     # Initialize Graph
     G=nx.DiGraph()
     with open(json_filepath) as f:
@@ -226,9 +221,11 @@ def nodehrefs():
     if (G.node[key].has_key('href')):
      urls.append(G.node[key]['href'])
     # ganglia url
-    urls.append('{0}?c=unspecified&h={1}'.format(ganglia_url, key))
+    if (settings.enable_ganglia):
+     urls.append('{0}?c=unspecified&h={1}'.format(ganglia_url, key))
     # kibana url
-    urls.append('{0}{1}?id={2}'.format(kibana_url, key, G.node[key]['kibanaid']))
+    if (settings.enable_elasticsearch):
+     urls.append('{0}{1}?id={2}'.format(kibana_url, key, G.node[key]['kibanaid']))
 
     # join urls
     urlhtml='<br/>'.join(

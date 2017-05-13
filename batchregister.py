@@ -1,14 +1,5 @@
 #!/usr/bin/env python
 
-###
-#json_filepath="/usr/local/applconn/applconn.json"
-json_filepath="/var/tmp/applconn/static/applconn.json"
-#elasticsearchurl='localhost:9200'
-elasticsearchurl='172.17.0.5:9200'
-elasticsearch_path='/applconn/'
-rsyncgitpath='/var/tmp/rsyncgit/'
-###
-
 import os
 import sys
 import glob
@@ -16,6 +7,11 @@ import json
 import requests
 import networkx as nx
 from networkx.readwrite import json_graph
+import settings
+
+json_filepath=settings.json_filepath
+elasticsearchurl=settings.elasticsearchurl
+rsyncgitpath=settings.rsyncgitpath
 
 def import_rsyncgit(G):
     '''rsyncgit'''
@@ -146,17 +142,17 @@ def main():
     js=json_graph.node_link_data(G)
 
     # ES output
+    if (settings.enable_elasticsearch):
+     try:
+      requests.delete("http://{0}/applconn/".format(elasticsearchurl))
 
-    try:
-     requests.delete("http://{0}/applconn/".format(elasticsearchurl))
+      for nodejson in js["nodes"]:
+       returned=requests.post('http://{0}/applconn/{1}'.format(elasticsearchurl, nodejson["id"]), data=json.dumps(nodejson))
+       kibanaid=json.loads(returned.content)["_id"]
+       nodejson["kibanaid"]=kibanaid
 
-     for nodejson in js["nodes"]:
-      returned=requests.post('http://{0}/applconn/{1}'.format(elasticsearchurl, nodejson["id"]), data=json.dumps(nodejson))
-      kibanaid=json.loads(returned.content)["_id"]
-      nodejson["kibanaid"]=kibanaid
-
-    except(requests.exceptions.ConnectionError) as e:
-     print ("WARN: can't connect ES")
+     except(requests.exceptions.ConnectionError) as e:
+      print ("WARN: can't connect ES")
 
     # json output
     with open(json_filepath,'w') as f:
