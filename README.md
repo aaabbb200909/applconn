@@ -5,7 +5,7 @@ import rsync+git to create JSON (optionally visualize with networkx+graphviz, se
 (Procedure is for CentOS7):
 ~~~~
 $ sudo yum install graphviz graphviz-devel gcc python-devel
-$ sudo pip install networkx pygraphviz
+$ sudo pip install networkx pygraphviz flask
 $ cd /var/tmp && git clone https://github.com/aaabbb200909/applconn.git && cd applconn
 $ ./batchregister.py # create test json
 $ python -m CGIHTTPServer
