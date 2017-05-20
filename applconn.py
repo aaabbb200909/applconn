@@ -163,14 +163,14 @@ def applconn():
          tmp['color'] = '#e2ecff'
       except (IOError):
        pass # ganglia is not available
-
-      #raise Exception, tmp['color']
-      tmp['href'] = './node-hrefs?key={0}'.format(n)
      else: 
       if (G.node[n].has_key('color')):
        tmp['color'] = G.node[n]['color']
-      if (G.node[n].has_key('href')):
-       tmp['href'] = './node-hrefs?key={0}'.format(n)
+
+     # set other things
+     tmp['href'] = './node-hrefs?key={0}'.format(n)
+     if (G.node[n].has_key('searchtag')):
+      tmp['searchtag'] = G.node[n]['searchtag']
 
     # json output
     js=json_graph.node_link_data(st)

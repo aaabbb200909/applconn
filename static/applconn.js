@@ -16,6 +16,7 @@ d3.json(jsonpath, function(json) {
       .size([w, h])
       .start();
 
+
   var link = vis.selectAll("line.link")
       .data(json.links)
     .enter().append("svg:line")
@@ -26,15 +27,25 @@ d3.json(jsonpath, function(json) {
       .attr("x2", function(d) { return d.target.x; })
       .attr("y2", function(d) { return d.target.y; });
 
+  var rect = vis.selectAll("xxx").data(json.nodes).enter()
+  .append("svg:rect")
+  .filter(function(d) {return d.searchtag == "All"})
+  .attr("x", function(d) { return d.x; })
+  .attr("y", function(d) { return d.y; })
+  .attr("width", "30")
+  .attr("height", "30")
+  .style("fill", function(d) { return d.color; })
+  .call(force.drag);
+  ;
+
   var node = vis.selectAll("circle.node")
       .data(json.nodes)
-    .enter().append("svg:circle")
+      .enter().append("svg:circle")
       .attr("class", "node")
       .attr("cx", function(d) { return d.x; })
       .attr("cy", function(d) { return d.y; })
-      .attr("r", 15)
+      .attr("r", 5)
       .style("fill", function(d) { return d.color; })
-      // .on("click", function(d) { window.open(d.href); })
       .call(force.drag);
 
   node.append("svg:title")
@@ -53,6 +64,9 @@ d3.json(jsonpath, function(json) {
 
     node.attr("cx", function(d) { return d.x; })
         .attr("cy", function(d) { return d.y; });
+
+    rect.attr("x", function(d) { return d.x; })
+        .attr("y", function(d) { return d.y; });
   });
 
 });
