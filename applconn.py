@@ -133,8 +133,8 @@ def applconn():
       node_types=[
       {"type": "server",
       "metric_func": server_metric_func,
-      "lower_bound": 0.5,
-      "upper_bound": 1.0,
+      "lower_bound": 2.0,
+      "upper_bound": 5.0,
       },
       {"type": "haproxy-thread",
       "metric_func": haproxy_metric_func,
