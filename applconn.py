@@ -6,7 +6,7 @@ import json
 import urllib
 import networkx as nx
 from networkx.readwrite import json_graph
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, url_for, request, redirect
 import settings
 
 app = Flask(__name__)
@@ -136,10 +136,7 @@ def applconn():
        pass # ganglia is not available
 
       #raise Exception, tmp['color']
-      if (n.find('_cpu') > -1):
-       tmp['href'] = '{0}/graph_all_periods.php?hreg%5B%5D={1}&mreg%5B%5D=cpu_&aggregate=1'.format(ganglia_url, n[:-4])
-      else:
-       tmp['href'] = './node-hrefs?key={0}'.format(n)
+      tmp['href'] = './node-hrefs?key={0}'.format(n)
      else: 
       if (G.node[n].has_key('color')):
        tmp['color'] = G.node[n]['color']
@@ -216,10 +213,19 @@ def node_hrefs():
      urls.append(G.node[key]['href'])
     # ganglia url
     if (settings.enable_ganglia):
-     urls.append('{0}?c=unspecified&h={1}'.format(ganglia_url, key))
+     if (key.find('_cpu') > -1):
+      urls.append('{0}/graph_all_periods.php?hreg%5B%5D={1}&mreg%5B%5D=cpu_&aggregate=1'.format(ganglia_url, key[:-4]))
+     elif (key.find('-haproxy') > -1):
+      urls.append('{0}/graph_all_periods.php?hreg%5B%5D={1}&mreg%5B%5D=haproxy&aggregate=1'.format(ganglia_url, key.split('-')[0]))
+     else:
+      urls.append('{0}?c=unspecified&h={1}'.format(ganglia_url, key))
     # kibana url
     if (settings.enable_elasticsearch):
      urls.append('{0}{1}?id={2}'.format(kibana_url, key, G.node[key]['kibanaid']))
+
+    # if only one url is found, return that
+    if (len(urls) == 1):
+     return (redirect(urls[0], code=302))
 
     # join urls
     urlhtml='<br/>'.join(
