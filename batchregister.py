@@ -104,9 +104,9 @@ def import_haproxy(G):
      G.add_node(nodename+"-haproxy", searchtag='Dev')
      G.add_edge(nodename, nodename+"-haproxy")
      for app in apps:
-      G.add_node(nodename+app["bind"], searchtag='Dev')
-      G.add_edge(nodename+"-haproxy", nodename+app["bind"])
-      G.add_edge(nodename+app["bind"], app["backend_ip"])
+      G.add_node(nodename+"-haproxy-"+app["name"], searchtag='Dev')
+      G.add_edge(nodename+"-haproxy", nodename+"-haproxy-"+app["name"])
+      G.add_edge(nodename+"-haproxy-"+app["name"], app["backend_ip"])
 
 def import_testlogic(G):
     G.add_node('1', searchtag='All')
@@ -128,16 +128,12 @@ def import_testlogic(G):
     for n in G:
      G.node[n]['name'] = n
 
-list_import_def=[
-#    import_ansible_facts,
-#    import_haproxy,
-    import_testlogic
-]
-
+list_import_def=settings.list_import_def
 
 def main():
     G=nx.DiGraph()
-    for func in list_import_def:
+    for funcname in list_import_def:
+        func = globals()[funcname]
         func(G)
     js=json_graph.node_link_data(G)
 
