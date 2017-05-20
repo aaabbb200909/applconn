@@ -197,11 +197,7 @@ def applconn():
                 <title></title>
         </head>
         <body>
-        <h2>graph</h2>
-         %s
-        <div id="data">
-        <a href="static/1.txt">Data</a>
-        </div>
+        <h2>Summary</h2>
         <div id="d3">
 
     <div id="chart"></div>
@@ -211,6 +207,12 @@ def applconn():
     <script type="text/javascript" src="static/applconn.js"></script>
 
         <a href="static/1.json">d3-graph-data</a>
+        </div>
+
+        <h2>Detail</h2>
+         %s
+        <div id="data">
+        <a href="static/1.txt">Data</a>
         </div>
         </body>
         </html>
