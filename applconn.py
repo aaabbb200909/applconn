@@ -119,16 +119,45 @@ def applconn():
      tmp = st.node[n]
      tmp['name'] = n
      if (enable_ganglia):
+
+      def server_metric_func(key):
+       return ('{0}/api/metrics.php?host={1}&metric_name=load_one'.format(ganglia_url, key))
+      
+      def haproxy_metric_func(key):
+       # 172.17.0.3-haproxy-main1081
+       tmp=key.split('-')
+       hostname=tmp[0]
+       applname='-'.join(tmp[1:])
+       return ('{0}/api/metrics.php?host={1}&metric_name={2}'.format(ganglia_url, hostname, applname))
+      
+      node_types=[
+      {"type": "server",
+      "metric_func": server_metric_func,
+      "lower_bound": 0.5,
+      "upper_bound": 1.0,
+      },
+      {"type": "haproxy-thread",
+      "metric_func": haproxy_metric_func,
+      "lower_bound": 5,
+      "upper_bound": 15,
+      }
+      ]
       try:
-       metric_url='{0}/api/metrics.php?host={1}&metric_name=load_one'.format(ganglia_url, n)
+       if (n.find('haproxy-') > -1):
+        node_type = 'haproxy-thread'
+       else:
+        node_type = 'server'
+       ctx = filter (lambda x: x["type"] == node_type, node_types) [0]
+       #print (ctx)
+       metric_url=ctx["metric_func"](n)
        f = urllib.urlopen(metric_url)
        js=json.loads(f.read()) # {"status":"ok","message":{"metric_value":"0.51","units":" "}}
        f.close()
        if (js['status']=='ok'):
         load_one=float(js['message']['metric_value'])
-        if (1.0 < load_one):
+        if (ctx["upper_bound"] < load_one):
          tmp['color'] = '#ff634f'
-        elif (0.5 < load_one < 1.0):
+        elif (ctx["lower_bound"] < load_one < ctx["upper_bound"]):
          tmp['color'] = '#ffde5e'
         else:
          tmp['color'] = '#e2ecff'
