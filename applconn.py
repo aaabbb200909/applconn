@@ -13,6 +13,8 @@ app = Flask(__name__)
 
 enable_ganglia=settings.enable_ganglia
 ganglia_url=settings.ganglia_url
+enable_prometheus=settings.enable_prometheus
+prometheus_url=settings.prometheus_url
 kibana_url=settings.kibana_url
 pathprefix=settings.pathprefix
 json_filepath=settings.json_filepath
@@ -118,18 +120,25 @@ def applconn():
     for n in st:
      tmp = st.node[n]
      tmp['name'] = n
-     if (enable_ganglia):
+     if (enable_ganglia or settings.enable_prometheus):
 
-      def server_metric_func(key):
+      def server_metric_func_ganglia(key):
        return ('{0}/api/metrics.php?host={1}&metric_name=load_one'.format(ganglia_url, key))
+
+      def server_metric_func_prometheus(key):
+       # TODO: return value is json, not float
+       return ('{0}/api/v1/query?query=node_load1{instance="{0}:9100"}'.format(prometheus_url, key))
       
-      def haproxy_metric_func(key):
+      def haproxy_metric_func_ganglia(key):
        # 172.17.0.3-haproxy-main1081
        tmp=key.split('-')
        hostname=tmp[0]
        applname='-'.join(tmp[1:])
        return ('{0}/api/metrics.php?host={1}&metric_name={2}'.format(ganglia_url, hostname, applname))
       
+      server_metric_func=server_metric_func_ganglia
+      haproxy_metric_func=haproxy_metric_func_ganglia
+
       node_types=[
       {"type": "server",
       "metric_func": server_metric_func,
