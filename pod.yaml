@@ -18,3 +18,5 @@ spec:
       postStart:
         exec:
           command: ["/bin/bash", "-c", "cd /var/tmp/applconn; sleep 30; ./batchregister.py"]
+  - name: prometheus-container
+    image: prom/prometheus
