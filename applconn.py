@@ -4,6 +4,7 @@ import os
 import sys
 import json
 import urllib
+import requests
 import networkx as nx
 from networkx.readwrite import json_graph
 from flask import Flask, render_template, url_for, request, redirect
@@ -156,11 +157,28 @@ def applconn():
 
       def server_metric_func_prometheus(key):
        # TODO: return value is json, not float
-       return ('{0}/api/v1/query?query=node_load1{instance="{0}:9100"}'.format(prometheus_url, key))
+       metric_url='{0}/api/v1/query?query=node_load1{{instance="{1}:9100"}}'.format(prometheus_url, key)
+       returned = requests.get(metric_url)
+       js=json.loads(returned.content) # {"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"node_load1","instance":"172.17.0.3:9100","job":"prometheus"},"value":[1495462713.021,"0.91"]}]}}
+       print (js)
+       if (js['status']=='success'):
+        if (len(js['data']['result']) > 0):
+         load_one=float(js['data']['result'][0]["value"][1])
+        else:
+         load_one=0 # hmmm ...
+       else:
+        load_one=0 # hmm ...
+       return load_one
       
+      def haproxy_metric_func_prometheus(key):
+       return 0
       
-      server_metric_func=server_metric_func_ganglia
-      haproxy_metric_func=haproxy_metric_func_ganglia
+      if (settings.enable_ganglia):
+       server_metric_func=server_metric_func_ganglia
+       haproxy_metric_func=haproxy_metric_func_ganglia
+      if (settings.enable_prometheus):
+       server_metric_func=server_metric_func_prometheus
+       haproxy_metric_func=haproxy_metric_func_prometheus
 
       node_types=[
       {"type": "server",
@@ -182,7 +200,7 @@ def applconn():
        ctx = filter (lambda x: x["type"] == node_type, node_types) [0]
        #print (ctx)
        load_one=ctx["metric_func"](n)
-       print (load_one)
+       #print (load_one)
        if (ctx["upper_bound"] < load_one):
         tmp['color'] = '#ff634f'
        elif (ctx["lower_bound"] < load_one < ctx["upper_bound"]):
