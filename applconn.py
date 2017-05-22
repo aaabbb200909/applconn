@@ -4,6 +4,7 @@ import os
 import sys
 import json
 import urllib
+import requests
 import networkx as nx
 from networkx.readwrite import json_graph
 from flask import Flask, render_template, url_for, request, redirect
@@ -122,22 +123,62 @@ def applconn():
      tmp['name'] = n
      if (enable_ganglia or settings.enable_prometheus):
 
-      def server_metric_func_ganglia(key):
+      def get_url_for_server_metric_func_ganglia(key):
        return ('{0}/api/metrics.php?host={1}&metric_name=load_one'.format(ganglia_url, key))
 
-      def server_metric_func_prometheus(key):
-       # TODO: return value is json, not float
-       return ('{0}/api/v1/query?query=node_load1{instance="{0}:9100"}'.format(prometheus_url, key))
-      
-      def haproxy_metric_func_ganglia(key):
+      def get_url_for_haproxy_metric_func_ganglia(key):
        # 172.17.0.3-haproxy-main1081
        tmp=key.split('-')
        hostname=tmp[0]
        applname='-'.join(tmp[1:])
        return ('{0}/api/metrics.php?host={1}&metric_name={2}'.format(ganglia_url, hostname, applname))
+       
+      def tmp_metric_func_ganglia(key, kind_of_node):
+       if (kind_of_node == "server"):
+        metric_url = get_url_for_server_metric_func_ganglia(key)
+       elif (kind_of_node == "haproxy"):
+        metric_url = get_url_for_haproxy_metric_func_ganglia(key)
+       else:
+        Exception("No Such kind_of_node: {0}", kind_of_node)
+       f = urllib.urlopen(metric_url)
+       js=json.loads(f.read()) # {"status":"ok","message":{"metric_value":"0.51","units":" "}}
+       f.close()
+       #print (js)
+       if (js['status']=='ok'):
+        load_one=float(js['message']['metric_value'])
+       else:
+        load_one=0 # hmm ...
+       return load_one
+
+      def server_metric_func_ganglia(key):
+       return tmp_metric_func_ganglia(key, "server")
+      def haproxy_metric_func_ganglia(key):
+       return tmp_metric_func_ganglia(key, "haproxy")
+
+      def server_metric_func_prometheus(key):
+       # TODO: return value is json, not float
+       metric_url='{0}/api/v1/query?query=node_load1{{instance="{1}:9100"}}'.format(prometheus_url, key)
+       returned = requests.get(metric_url)
+       js=json.loads(returned.content) # {"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"node_load1","instance":"172.17.0.3:9100","job":"prometheus"},"value":[1495462713.021,"0.91"]}]}}
+       print (js)
+       if (js['status']=='success'):
+        if (len(js['data']['result']) > 0):
+         load_one=float(js['data']['result'][0]["value"][1])
+        else:
+         load_one=0 # hmmm ...
+       else:
+        load_one=0 # hmm ...
+       return load_one
       
-      server_metric_func=server_metric_func_ganglia
-      haproxy_metric_func=haproxy_metric_func_ganglia
+      def haproxy_metric_func_prometheus(key):
+       return 0
+      
+      if (settings.enable_ganglia):
+       server_metric_func=server_metric_func_ganglia
+       haproxy_metric_func=haproxy_metric_func_ganglia
+      if (settings.enable_prometheus):
+       server_metric_func=server_metric_func_prometheus
+       haproxy_metric_func=haproxy_metric_func_prometheus
 
       node_types=[
       {"type": "server",
@@ -158,18 +199,14 @@ def applconn():
         node_type = 'server'
        ctx = filter (lambda x: x["type"] == node_type, node_types) [0]
        #print (ctx)
-       metric_url=ctx["metric_func"](n)
-       f = urllib.urlopen(metric_url)
-       js=json.loads(f.read()) # {"status":"ok","message":{"metric_value":"0.51","units":" "}}
-       f.close()
-       if (js['status']=='ok'):
-        load_one=float(js['message']['metric_value'])
-        if (ctx["upper_bound"] < load_one):
-         tmp['color'] = '#ff634f'
-        elif (ctx["lower_bound"] < load_one < ctx["upper_bound"]):
-         tmp['color'] = '#ffde5e'
-        else:
-         tmp['color'] = '#e2ecff'
+       load_one=ctx["metric_func"](n)
+       #print (load_one)
+       if (ctx["upper_bound"] < load_one):
+        tmp['color'] = '#ff634f'
+       elif (ctx["lower_bound"] < load_one < ctx["upper_bound"]):
+        tmp['color'] = '#ffde5e'
+       else:
+        tmp['color'] = '#e2ecff'
       except (IOError):
        pass # ganglia is not available
      else: 
