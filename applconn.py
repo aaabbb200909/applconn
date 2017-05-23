@@ -155,12 +155,20 @@ def applconn():
       def haproxy_metric_func_ganglia(key):
        return tmp_metric_func_ganglia(key, "haproxy")
 
-      def server_metric_func_prometheus(key):
+      def tmp_metric_func_prometheus(key, kind_of_node):
        # TODO: return value is json, not float
-       metric_url='{0}/api/v1/query?query=node_load1{{instance="{1}:9100"}}'.format(prometheus_url, key)
+       if (kind_of_node == "server"):
+        metric_url='{0}/api/v1/query?query=node_load1{{instance="{1}:9100"}}'.format(prometheus_url, key)
+       elif (kind_of_node == "haproxy"):
+        tmp=key.split('-')
+        nodename=tmp[0]
+        applname=tmp[2]
+        metric_url='{0}/api/v1/query?query=haproxy_frontend_current_sessions{{frontend="{1}",instance="{2}:9101"}}'.format(prometheus_url, applname, nodename)
+       else:
+        Exception("No Such kind_of_node: {0}", kind_of_node)
        returned = requests.get(metric_url)
        js=json.loads(returned.content) # {"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"node_load1","instance":"172.17.0.3:9100","job":"prometheus"},"value":[1495462713.021,"0.91"]}]}}
-       print (js)
+       #print (js)
        if (js['status']=='success'):
         if (len(js['data']['result']) > 0):
          load_one=float(js['data']['result'][0]["value"][1])
@@ -169,9 +177,12 @@ def applconn():
        else:
         load_one=0 # hmm ...
        return load_one
+
+      def server_metric_func_prometheus(key):
+       return tmp_metric_func_prometheus(key, "server")
       
       def haproxy_metric_func_prometheus(key):
-       return 0
+       return tmp_metric_func_prometheus(key, "haproxy")
       
       if (settings.enable_ganglia):
        server_metric_func=server_metric_func_ganglia
