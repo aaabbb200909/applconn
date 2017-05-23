@@ -1,6 +1,6 @@
 json_filepath="/var/tmp/applconn/static/applconn.json"
-#pathprefix='/var/www/html/applconn/'
 pathprefix='/var/tmp/applconn/static'
+rsyncgitpath='/var/tmp/rsyncgit/'
 
 ##
 
@@ -13,15 +13,16 @@ list_import_def=[
 ##
 enable_ganglia=False
 enable_elasticsearch=False
-enable_prometheus=True
+enable_prometheus=False
 
-#elasticsearchurl='172.17.0.5:9200'
-elasticsearchurl='localhost:9200'
-rsyncgitpath='/var/tmp/rsyncgit/'
+ganglia_url='http://127.0.0.1/ganglia/'
+elasticsearchurl='127.0.0.1:9200'
+kibana_url='http://127.0.0.1:5601/app/kibana#/doc/*/applconn/'
+prometheus_url='http://127.0.0.1:9090/'
 
-#ganglia_url='http://127.0.0.1/ganglia/'
-ganglia_url='http://172.17.0.2/ganglia/'
-kibana_url='http://172.17.0.5:5601/app/kibana#/doc/*/applconn/'
 
-#prometheus_url='http://127.0.0.1:9090/'
-prometheus_url='http://172.17.0.2:9090/'
+# override settings if local_settings.py is there
+try:
+ from local_settings import *
+except ImportError as e:
+ pass
