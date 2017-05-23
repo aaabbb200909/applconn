@@ -307,6 +307,15 @@ def node_hrefs():
       urls.append('{0}/graph_all_periods.php?hreg%5B%5D={1}&mreg%5B%5D=haproxy&aggregate=1'.format(ganglia_url, key.split('-')[0]))
      else:
       urls.append('{0}?c=unspecified&h={1}'.format(ganglia_url, key))
+    if (settings.enable_prometheus):
+     if (key.find('-haproxy') > -1):
+      tmp=key.split('-')
+      nodename=tmp[0]
+      applname=tmp[2]
+      urls.append('{0}/graph?g0.range_input=1h&g0.expr=haproxy_frontend_current_sessions{{instance%3D"{1}%3A9101",frontend%3D"{2}"}}&g0.tab=0'.format(prometheus_url, nodename, applname))
+     else:
+      urls.append('{0}/graph?g0.range_input=1h&g0.expr=node_load1{{instance%3D"{1}%3A9100"}}&g0.tab=0'.format(prometheus_url, key))
+
     # kibana url
     if (settings.enable_elasticsearch):
      urls.append('{0}{1}?id={2}'.format(kibana_url, key, G.node[key]['kibanaid']))
