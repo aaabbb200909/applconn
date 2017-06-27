@@ -350,5 +350,13 @@ def index():
     return render_template('index.html')
 
 
+@app.route("/prom-sd-file")
+def prom_sd_file():
+  with open(json_filepath) as f:
+    jsondata=json.loads(f.read())
+    tmp=[node["name"]+":9100" for node in jsondata["nodes"] if node["searchtag"] == "All" and node["name"].find ("172.17") > -1]
+    return json.dumps([{"targets": tmp}])
+
+
 if __name__ == "__main__":
     app.run()
