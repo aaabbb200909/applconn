@@ -7,6 +7,8 @@ rsyncgitpath='/var/tmp/rsyncgit/'
 list_import_def=[
     #"import_ansible_facts",
     #"import_haproxy",
+    #"import_tungsten_fabric_network_policy",
+    #"import_tungsten_fabric_prouterlinkentry",
     "import_testlogic"
 ]
 

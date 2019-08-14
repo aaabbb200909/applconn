@@ -128,6 +128,65 @@ def import_testlogic(G):
     for n in G:
      G.node[n]['name'] = n
 
+def import_tungsten_fabric_prouterlinkentry(G):
+    with open ('/tmp/prouterlinkentry.json') as f:
+      js = json.loads (f.read())
+    for prouter in js:
+      #print (prouter['name'])
+      G.add_node(prouter['name'], searchtag='All')
+      for link in prouter['link_table']:
+        #print ('  ' + link['remote_system_name'])
+        if (prouter['role']=='spine'):
+          #print (prouter['name'], link['remote_system_name'])
+          G.add_edge (prouter['name'], link['remote_system_name'])
+        elif (prouter['role']=='leaf'):
+          G.add_edge (link['remote_system_name'], prouter['name'])
+
+def import_tungsten_fabric_network_policy(G):
+    network_policies=[]
+    with open ('/tmp/network-policy1.json') as f:
+      js = json.loads (f.read())
+    network_policies.append(js.copy())
+    with open ('/tmp/network-policy2.json') as f:
+      js = json.loads (f.read())
+    network_policies.append(js.copy())
+    #print (network_policies)
+    for network_policy in network_policies:
+      tmp = network_policy["network_policy_entries"]["policy_rule"][0]
+      src_vn = tmp["src_addresses"][0]["virtual_network"]
+      dst_vn = tmp["dst_addresses"][0]["virtual_network"]
+      G.add_node(src_vn, searchtag='All')
+      G.add_node(dst_vn, searchtag='All')
+      service_instances = tmp["action_list"]["apply_service"]
+      if (len (service_instances) == 0):
+        G.add_edge (src_vn, dst_vn)
+      else:
+        G.add_node (service_instances[0], searchtag='All')
+        G.add_edge (src_vn, service_instances[0])
+        G.add_node (service_instances[-1], searchtag='All')
+        G.add_edge (dst_vn, service_instances[-1])
+        for i in range(len(service_instances)):
+          if (i == len(service_instances) - 1):
+            break
+          else:
+            G.add_edge (service_instances[i], service_instances[i+1])
+    ## test
+    G.add_node("host01")
+    G.add_edge("host01", "default-domain:k8s-default:vn1-to-vn2")
+    G.add_edge("vqfx191", "default-domain:default-project:vn11")
+    G.add_edge("vqfx192", "default-domain:default-project:vn11")
+    G.add_edge("vqfx193", "default-domain:default-project:vn11")
+    G.add_edge("vqfx191", "default-domain:default-project:vn12")
+    G.add_edge("vqfx192", "default-domain:default-project:vn12")
+    G.add_edge("vqfx193", "default-domain:default-project:vn12")
+    G.add_edge("vqfx191", "default-domain:default-project:vn1")
+    G.add_edge("vqfx192", "default-domain:default-project:vn1")
+    G.add_edge("vqfx193", "default-domain:default-project:vn1")
+    G.add_edge("vqfx191", "default-domain:default-project:vn2")
+    G.add_edge("vqfx192", "default-domain:default-project:vn2")
+    G.add_edge("vqfx193", "default-domain:default-project:vn2")
+
+
 list_import_def=settings.list_import_def
 
 def main():
