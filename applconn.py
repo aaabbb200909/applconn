@@ -79,6 +79,8 @@ def applconn():
      searchtags.append('Ops')
     if (fs.has_key('SearchNet')): 
      searchtags.append('Net')
+    if (fs.has_key('SearchSdn')): 
+     searchtags.append('Sdn')
     for nodeid in G.nodes():
      if (not 'searchtag' in G.node[nodeid] or not G.node[nodeid]['searchtag'] in searchtags):
       G.remove_node(nodeid)
@@ -240,6 +242,12 @@ def applconn():
     
     ## SVG
     drawimage('1')
+
+    ### Write down all the data
+    #A=nx.nx_agraph.to_agraph(G)
+    #A.write(pathprefix+'/a.txt')
+    #drawimage('a')
+
     
     ## inline svg
     with open(pathprefix+'/1.svg') as svgfile:

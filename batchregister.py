@@ -133,7 +133,7 @@ def import_tungsten_fabric_prouterlinkentry(G):
       js = json.loads (f.read())
     for prouter in js:
       #print (prouter['name'])
-      G.add_node(prouter['name'], searchtag='All')
+      G.add_node(prouter['name'], searchtag='Net')
       for link in prouter['link_table']:
         #print ('  ' + link['remote_system_name'])
         if (prouter['role']=='spine'):
@@ -155,11 +155,12 @@ def import_tungsten_fabric_network_policy(G):
       tmp = network_policy["network_policy_entries"]["policy_rule"][0]
       src_vn = tmp["src_addresses"][0]["virtual_network"]
       dst_vn = tmp["dst_addresses"][0]["virtual_network"]
-      G.add_node(src_vn, searchtag='All')
-      G.add_node(dst_vn, searchtag='All')
+      G.add_node(src_vn, searchtag='Sdn')
+      G.add_node(dst_vn, searchtag='Sdn')
       service_instances = tmp["action_list"]["apply_service"]
       if (len (service_instances) == 0):
         G.add_edge (src_vn, dst_vn)
+        G.add_edge (dst_vn, src_vn)
       else:
         G.add_node (service_instances[0], searchtag='All')
         G.add_edge (src_vn, service_instances[0])
@@ -171,8 +172,8 @@ def import_tungsten_fabric_network_policy(G):
           else:
             G.add_edge (service_instances[i], service_instances[i+1])
     ## test
-    G.add_node("host01")
-    G.add_edge("host01", "default-domain:k8s-default:vn1-to-vn2")
+    G.add_node("host01", searchtag='Ops')
+    G.add_edge("host01", "default-domain:default-project:vn1-to-vn2")
     G.add_edge("vqfx191", "default-domain:default-project:vn11")
     G.add_edge("vqfx192", "default-domain:default-project:vn11")
     G.add_edge("vqfx193", "default-domain:default-project:vn11")
@@ -185,6 +186,8 @@ def import_tungsten_fabric_network_policy(G):
     G.add_edge("vqfx191", "default-domain:default-project:vn2")
     G.add_edge("vqfx192", "default-domain:default-project:vn2")
     G.add_edge("vqfx193", "default-domain:default-project:vn2")
+    G.add_edge("vqfx194", "host01")
+    G.add_edge("vqfx195", "host01")
 
 
 list_import_def=settings.list_import_def
